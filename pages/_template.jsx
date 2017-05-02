@@ -1,9 +1,35 @@
 import React from "react"
 import { Link } from "react-router"
+import { Provider } from 'react-redux';
 import { prefixLink } from "gatsby-helpers"
 import Helmet from "react-helmet"
+import { apiMiddleware } from 'redux-api-middleware';
 import { config } from "config"
 import { rhythm } from "../utils/typography"
+
+import { createStore, applyMiddleware, compose } from 'redux';
+
+const reducer = state => state;
+
+const initialState = {
+    foo: 1,
+    bar: 2,
+    baz: 3
+};
+
+const store = createStore(
+  reducer,
+  initialState,
+  compose(
+    applyMiddleware(apiMiddleware),
+    (window.devToolsExtension)
+        ? window.devToolsExtension({
+            name: 'Fabric',
+            instanceId: 'Fabric'
+        })
+        : self => self
+  )
+);
 
 module.exports = React.createClass({
   propTypes() {
@@ -55,7 +81,9 @@ module.exports = React.createClass({
             paddingTop: 0,
           }}
         >
-          {this.props.children}
+          <Provider store={store}>
+            {this.props.children}
+          </Provider>
         </div>
       </div>
     )
